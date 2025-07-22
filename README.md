@@ -139,7 +139,7 @@ cp -r .github/ /path/to/your-project/
 
 ```bash
 # Add as git submodule for easy updates
-git submodule add https://github.com/ncklrs/vscode-agent-prompts .github/workflows/vscode-agent-prompts
+git submodule add https://github.com/ncklrs/copilot-agent-prompts .github/workflows/copilot-agent-prompts
 ```
 
 #### Option 3: User Profile Integration
@@ -150,7 +150,7 @@ Add to your global AI assistant configuration:
 # ~/.ai-assistant/config.yaml
 workflows:
   spec_driven:
-    prompts_path: "/path/to/vscode-agent-prompts/.github/"
+    prompts_path: "/path/to/copilot-agent-prompts/.github/"
     auto_trigger: true
     default_workflow: "spec-requirements-clarification"
 ```
