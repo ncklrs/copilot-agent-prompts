@@ -1,0 +1,37 @@
+name: "Spec Task Execution Hook"
+description: "Automatically provides task execution guidance when users interact with task files or request task execution"
+triggers:
+  - pattern: ".github/specs/**/tasks.md"
+    events: ["modify"]
+    conditions:
+      - content_contains: "- [x]" # Triggered when tasks are marked complete
+  - pattern: "src/**/*"
+    events: ["create", "modify"]
+    conditions:
+      - comment_contains: "@spec-task" # Triggered when code references spec tasks
+conditions:
+  - file_size_mb: { max: 5 }
+agent_request: |
+  Task execution activity detected. Please provide guidance using the spec-task-execution workflow.
+
+  Follow the task execution process:
+  1. Read requirements.md, design.md, and tasks.md from the appropriate .github/specs/{feature_name}/ directory
+  2. Focus on ONE task at a time
+  3. Verify implementation against requirements and design
+  4. Include appropriate testing as specified
+  5. Provide completion summary including files modified and tests run
+  6. Mark task complete in tasks.md by checking the checkbox
+  7. Wait for user review before proceeding to next task
+
+  Remember: Execute only one task at a time and stop for user review after each completion.
+context_files:
+  - ".github/spec-task-execution.md"
+  - ".github/specs/**/requirements.md"
+  - ".github/specs/**/design.md"
+  - ".github/specs/**/tasks.md"
+  - "src/**/*"
+  - "test/**/*"
+  - "tests/**/*"
+scope: "project"
+priority: "medium"
+background: true

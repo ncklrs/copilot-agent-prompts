@@ -1,0 +1,235 @@
+{
+  "schema_version": "1.0",
+  "workflow_state": {
+    "workflow_id": {
+      "type": "string",
+      "pattern": "^workflow_[a-zA-Z0-9_-]+_[0-9]+$",
+      "description": "Unique identifier for workflow instance"
+    },
+    "feature_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Feature identifier this workflow is processing"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["initialized", "in_progress", "completed", "failed", "blocked", "paused"],
+      "description": "Current overall workflow status"
+    },
+    "current_stage": {
+      "type": "string",
+      "enum": ["requirements", "design", "validation", "coordination", "analysis", "implementation", "testing", "documentation", "process"],
+      "description": "Current workflow stage being executed"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when workflow started"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time", 
+      "description": "ISO 8601 timestamp of last update"
+    },
+    "completed_stages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["requirements", "design", "validation", "coordination", "analysis", "implementation", "testing", "documentation", "process"]
+      },
+      "description": "List of successfully completed workflow stages"
+    },
+    "failed_stages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of stages that failed during execution"
+    },
+    "blocked_stages": {
+      "type": "array", 
+      "items": {
+        "type": "string"
+      },
+      "description": "List of stages currently blocked by dependencies"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "priority": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "description": "Workflow execution priority"
+        },
+        "assignee": {
+          "type": "string",
+          "description": "Team member or team responsible for workflow"
+        },
+        "estimated_completion": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Estimated completion timestamp"
+        },
+        "actual_duration": {
+          "type": "string",
+          "pattern": "^[0-9]+[mhd]$",
+          "description": "Actual duration in minutes(m), hours(h), or days(d)"
+        },
+        "complexity_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Workflow complexity score (0-10)"
+        }
+      }
+    }
+  },
+  "feature_progress": {
+    "feature_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "overall_progress": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Overall feature completion percentage"
+    },
+    "stage_progress": {
+      "type": "object",
+      "properties": {
+        "requirements": {"type": "integer", "minimum": 0, "maximum": 100},
+        "design": {"type": "integer", "minimum": 0, "maximum": 100},
+        "validation": {"type": "integer", "minimum": 0, "maximum": 100},
+        "coordination": {"type": "integer", "minimum": 0, "maximum": 100},
+        "analysis": {"type": "integer", "minimum": 0, "maximum": 100},
+        "implementation": {"type": "integer", "minimum": 0, "maximum": 100},
+        "testing": {"type": "integer", "minimum": 0, "maximum": 100},
+        "documentation": {"type": "integer", "minimum": 0, "maximum": 100}
+      }
+    },
+    "milestone_status": {
+      "type": "object",
+      "properties": {
+        "requirements_approved": {"type": "boolean"},
+        "design_reviewed": {"type": "boolean"},
+        "security_cleared": {"type": "boolean"},
+        "integration_planned": {"type": "boolean"},
+        "implementation_ready": {"type": "boolean"},
+        "testing_complete": {"type": "boolean"},
+        "documentation_complete": {"type": "boolean"}
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "properties": {
+        "blocked_by": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Features that must complete before this feature can proceed"
+        },
+        "blocking": {
+          "type": "array", 
+          "items": {"type": "string"},
+          "description": "Features that are waiting for this feature to complete"
+        },
+        "shared_components": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Components shared with other features"
+        }
+      }
+    },
+    "quality_gates": {
+      "type": "object",
+      "properties": {
+        "validation_passed": {"type": "boolean"},
+        "security_approved": {"type": "boolean"},
+        "performance_cleared": {"type": "boolean"},
+        "integration_verified": {"type": "boolean"}
+      }
+    }
+  },
+  "coordination_state": {
+    "project_id": {
+      "type": "string",
+      "description": "Project identifier for multi-feature coordination"
+    },
+    "coordination_status": {
+      "type": "object",
+      "properties": {
+        "active_features": {"type": "integer", "minimum": 0},
+        "completed_features": {"type": "integer", "minimum": 0},
+        "blocked_features": {"type": "integer", "minimum": 0},
+        "conflict_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "dependency_graph": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"type": "string"},
+              "status": {"type": "string", "enum": ["waiting", "in_progress", "completed", "blocked", "failed"]},
+              "priority": {"type": "string", "enum": ["low", "medium", "high", "critical"]}
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object", 
+            "properties": {
+              "from": {"type": "string"},
+              "to": {"type": "string"},
+              "type": {"type": "string", "enum": ["prerequisite", "dependency", "conflict", "shared_resource"]}
+            }
+          }
+        }
+      }
+    },
+    "resource_allocation": {
+      "type": "object",
+      "properties": {
+        "shared_components": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z0-9_-]+$": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          }
+        },
+        "team_assignments": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z0-9_-]+$": {
+              "type": "array", 
+              "items": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "integration_timeline": {
+      "type": "object",
+      "properties": {
+        "phases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "phase": {"type": "string"},
+              "features": {"type": "array", "items": {"type": "string"}},
+              "target_date": {"type": "string", "format": "date"},
+              "status": {"type": "string", "enum": ["waiting", "in_progress", "completed", "delayed"]}
+            }
+          }
+        }
+      }
+    }
+  }
+}

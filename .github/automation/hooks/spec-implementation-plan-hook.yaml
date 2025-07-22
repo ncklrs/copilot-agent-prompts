@@ -1,0 +1,29 @@
+name: "Spec Implementation Plan Hook"
+description: "Automatically triggers implementation planning workflow when task files are created or modified"
+triggers:
+  - pattern: ".github/specs/**/tasks.md"
+    events: ["create", "modify"]
+conditions:
+  - file_size_mb: { max: 2 }
+  - requires_file: ".github/specs/{feature_name}/requirements.md"
+  - requires_file: ".github/specs/{feature_name}/design.md"
+agent_request: |
+  A tasks document has been created or modified. Please review and help create the implementation plan using the spec-implementation-plan workflow.
+
+  Follow the implementation planning process:
+  1. Ensure both requirements.md and design.md exist and are approved
+  2. Break down the design into actionable coding tasks
+  3. Use test-driven development approach with incremental progress
+  4. Format as numbered checkbox list with maximum two levels of hierarchy
+  5. Ensure each task references specific requirements and design sections
+  6. Include testing requirements for each task
+  7. Get user approval before tasks can be executed
+
+  Focus ONLY on coding tasks (writing, modifying, testing code). Exclude deployment, user testing, or non-coding activities.
+context_files:
+  - ".github/spec-implementation-plan.md"
+  - ".github/specs/**/requirements.md"
+  - ".github/specs/**/design.md"
+  - "README.md"
+scope: "project"
+priority: "high"

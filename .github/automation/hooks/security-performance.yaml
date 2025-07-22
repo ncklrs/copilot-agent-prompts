@@ -1,0 +1,76 @@
+# Security and Performance Analysis Hook Configuration
+name: "Security and Performance Analysis"
+version: "1.0"
+description: "Automatically triggers security and performance analysis for sensitive features"
+
+triggers:
+  - pattern: ".github/specs/**/design.md"
+    events: ["create", "modify"]
+
+conditions:
+  or:
+    - file_contains_any: 
+        - "authentication"
+        - "authorization" 
+        - "security"
+        - "api"
+        - "database"
+        - "user data"
+        - "external"
+        - "performance"
+        - "scalability"
+        - "concurrent"
+    - feature_type: ["critical", "high-impact"]
+
+agent_request: |
+  Use the enhanced analysis prompt to perform security and performance analysis.
+  
+  #enhanced-analysis
+  
+  Please conduct comprehensive security and performance analysis focusing on:
+  
+  1. Threat modeling and vulnerability assessment
+  2. Performance bottleneck identification
+  3. Scalability considerations and limitations
+  4. Security control recommendations
+  5. Monitoring and observability requirements
+  
+  Generate detailed analysis with specific mitigation strategies and performance optimization recommendations.
+
+context_files:
+  - ".github/specs/{feature_id}/*.md"
+  - ".github/enhanced-prompts/spec-performance-security.md"
+  - ".github/enhanced-prompt-selector.md"
+  - "security-guidelines.md"
+  - "performance-requirements.md"
+
+output_pattern: ".github/analysis/security-performance-{feature_id}.md"
+
+workflow_metadata:
+  stage: "analysis"
+  priority: "critical"
+  blocking: true  # Security analysis must complete
+  timeout: "15m"
+
+parallel_execution:
+  security_focus:
+    agent_request_suffix: "Focus primarily on security aspects and threat modeling."
+    output_pattern: ".github/analysis/security-{feature_id}.md"
+  performance_focus:
+    agent_request_suffix: "Focus primarily on performance optimization and scalability."
+    output_pattern: ".github/analysis/performance-{feature_id}.md"
+
+success_criteria:
+  - output_contains: "SECURITY ANALYSIS COMPLETE"
+  - output_contains: "PERFORMANCE ANALYSIS COMPLETE"
+  - no_critical_security_issues: true
+
+escalation_triggers:
+  - critical_security_vulnerability_found:
+      notify: "security_team"
+      create_incident: true
+      priority: "P0"
+  - performance_bottleneck_identified:
+      notify: "performance_team"
+      create_task: true
+      priority: "high"

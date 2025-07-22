@@ -1,0 +1,26 @@
+name: "Spec Requirements Clarification Hook"
+description: "Automatically triggers requirements clarification workflow when requirement files are created or modified"
+triggers:
+  - pattern: ".github/specs/**/requirements.md"
+    events: ["create", "modify"]
+  - pattern: ".github/specs/**/requirements.txt"
+    events: ["create", "modify"]
+conditions:
+  - file_size_mb: { max: 2 }
+agent_request: |
+  A requirements document has been created or modified. Please review and help clarify the requirements using the spec-requirements-clarification workflow.
+
+  Follow the requirements gathering process:
+  1. Review the current requirements document
+  2. Check for completeness and EARS format compliance
+  3. Suggest improvements or clarifications if needed
+  4. Help iterate on the requirements until they are complete and approved
+
+  Use the EARS format (Easy Approach to Requirements Syntax) and ensure all user stories follow the format: "As a [role], I want [feature], so that [benefit]"
+context_files:
+  - ".github/spec-requirements-clarification.md"
+  - "README.md"
+  - ".github/specs/**/design.md"
+  - ".github/specs/**/tasks.md"
+scope: "project"
+priority: "high"

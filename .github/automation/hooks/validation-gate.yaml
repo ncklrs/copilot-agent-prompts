@@ -1,0 +1,53 @@
+# Validation Gate Hook Configuration
+name: "Enhanced Specification Validation"
+version: "1.0"
+description: "Automatically validates specifications using enhanced EARS validation prompt"
+
+triggers:
+  - pattern: ".github/specs/**/requirements.md"
+    events: ["create", "modify"]
+  - pattern: ".github/specs/**/design.md"
+    events: ["create", "modify"]
+
+conditions:
+  and:
+    - file_exists: ".github/specs/{feature_id}/requirements.md"
+    - file_size_mb: { min: 0.05 }  # Must have meaningful content
+
+agent_request: |
+  Use the enhanced validation prompt to validate this specification file.
+  
+  #enhanced-validation
+  
+  Please perform comprehensive EARS format validation and traceability analysis for this specification. Focus on:
+  
+  1. EARS format compliance for all acceptance criteria
+  2. Requirements-to-design traceability verification
+  3. Completeness assessment and gap identification
+  4. Cross-reference validation and consistency checks
+  
+  Generate a structured validation report with specific line references and actionable recommendations.
+
+context_files:
+  - ".github/specs/{feature_id}/*.md"
+  - ".github/enhanced-prompts/spec-review-validation.md"
+  - ".github/enhanced-prompt-selector.md"
+
+output_pattern: ".github/specs/{feature_id}/validation-report.md"
+
+workflow_metadata:
+  stage: "validation"
+  priority: "critical"
+  blocking: true  # Must pass before proceeding to implementation
+  timeout: "5m"
+
+success_criteria:
+  - output_contains: "VALIDATION STATUS: PASSED"
+  - no_critical_errors: true
+
+failure_actions:
+  - create_issue: 
+      title: "Specification Validation Failed: {feature_id}"
+      labels: ["validation-failure", "needs-review"]
+  - block_downstream_hooks: true
+  - notify: "specification_reviewers"

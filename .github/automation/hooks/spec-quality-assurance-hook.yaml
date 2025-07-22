@@ -1,0 +1,43 @@
+name: "Spec Quality Assurance Hook"
+description: "Automatically reviews spec documents for completeness and compliance with workflow standards"
+triggers:
+  - pattern: ".github/specs/**/*.md"
+    events: ["modify"]
+conditions:
+  - file_size_mb: { max: 3 }
+agent_request: |
+  A spec document has been modified. Please perform quality assurance review to ensure compliance with workflow standards.
+
+  Review checklist based on file type:
+
+  For requirements.md:
+  - User stories follow "As a [role], I want [feature], so that [benefit]" format
+  - Acceptance criteria use EARS format
+  - All edge cases are considered (security, performance, accessibility, etc.)
+  - Requirements are numbered and traceable
+
+  For design.md:
+  - All required sections are present (Overview, Architecture, Components, Data Models, Error Handling, Testing Strategy, Security, Performance)
+  - Design addresses all requirements from requirements.md
+  - Design decisions are documented with rationales
+  - Diagrams are included where appropriate
+
+  For tasks.md:
+  - Tasks follow checkbox format with proper numbering
+  - Each task references specific requirements
+  - Tasks are focused on coding activities only
+  - Test-driven development approach is followed
+  - Tasks build incrementally
+
+  Provide specific feedback on compliance issues and suggest improvements.
+context_files:
+  - ".github/spec-requirements-clarification.md"
+  - ".github/spec-design-document.md"
+  - ".github/spec-implementation-plan.md"
+  - ".github/specs/**/requirements.md"
+  - ".github/specs/**/design.md"
+  - ".github/specs/**/tasks.md"
+  - "README.md"
+scope: "project"
+priority: "medium"
+background: true

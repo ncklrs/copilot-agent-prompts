@@ -1,0 +1,33 @@
+name: "Spec Workflow Initialization Hook"
+description: "Automatically triggers the appropriate spec workflow when new spec directories or files are created"
+triggers:
+  - pattern: ".github/specs/**/*"
+    events: ["create"]
+  - pattern: ".github/specs/*"
+    events: ["create"]
+conditions:
+  - file_size_mb: { max: 1 }
+agent_request: |
+  A new spec file or directory has been created. Please help initialize the appropriate workflow stage.
+
+  Determine the appropriate workflow stage based on what was created:
+  - If requirements.md: Use spec-requirements-clarification workflow
+  - If design.md: Use spec-design-document workflow  
+  - If tasks.md: Use spec-implementation-plan workflow
+  - If new spec directory: Guide user through starting with requirements
+
+  Ensure the user follows the proper sequence:
+  1. Requirements Clarification (requirements.md)
+  2. Design Document Creation (design.md)
+  3. Implementation Planning (tasks.md)
+  4. Task Execution (individual tasks)
+
+  Provide guidance on the current stage and what needs to be completed before proceeding to the next stage.
+context_files:
+  - ".github/spec-requirements-clarification.md"
+  - ".github/spec-design-document.md"
+  - ".github/spec-implementation-plan.md"
+  - ".github/spec-task-execution.md"
+  - "README.md"
+scope: "project"
+priority: "high"
